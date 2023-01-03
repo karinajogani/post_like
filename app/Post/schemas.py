@@ -6,7 +6,8 @@ class PostPy(BaseModel):
     description : str
     user_id : str
     post_type : str
-    
+    post_display_user: str
+
     # class config:
     #     orm_mode = True
         

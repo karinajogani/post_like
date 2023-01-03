@@ -1,8 +1,8 @@
-"""Added table
+"""create table
 
-Revision ID: c234db8bc21e
+Revision ID: ddf0d345bf5d
 Revises: 
-Create Date: 2022-12-28 15:24:26.556277
+Create Date: 2023-01-03 17:18:11.479190
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = 'c234db8bc21e'
+revision = 'ddf0d345bf5d'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -39,6 +39,7 @@ def upgrade():
     sa.Column('user_id', postgresql.UUID(), nullable=True),
     sa.Column('total_like', sa.Integer(), nullable=True),
     sa.Column('post_type', sa.String(), nullable=True),
+    sa.Column('post_display_user', sa.String(), nullable=True),
     sa.ForeignKeyConstraint(['user_id'], ['User.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -48,10 +49,9 @@ def upgrade():
     sa.Column('updated_at', sa.DateTime(), nullable=True),
     sa.Column('created_by', sa.String(), nullable=True),
     sa.Column('updated_by', sa.String(), nullable=True),
-    sa.Column('name', sa.String(), nullable=True),
     sa.Column('user_id', postgresql.UUID(), nullable=True),
-    sa.Column('Post_id', postgresql.UUID(), nullable=True),
-    sa.ForeignKeyConstraint(['Post_id'], ['Post.id'], ),
+    sa.Column('post_id', postgresql.UUID(), nullable=True),
+    sa.ForeignKeyConstraint(['post_id'], ['Post.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['User.id'], ),
     sa.PrimaryKeyConstraint('id')
     )

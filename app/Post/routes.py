@@ -25,9 +25,9 @@ def create_new_post(post:PostPy, db:Session = Depends(get_db)):
 def update_post(post_id:str, user_id:str, post:PostUpdate, db: Session = Depends(get_db)):
     
     post_obj = db.query(Post).filter(Post.id == id).first()
-    post_user_id_column = db.query(Post.user_id).filter(Post.id == post_id).first()
-    post_user_id = post_user_id_column["user_id"]
-    if post_user_id == user_id:
+    post_user_id = db.query(Post.user_id).filter(Post.id == post_id).first()
+    post_user = post_user_id["user_id"]
+    if post_user== user_id:
 
         post_obj.updated_at = datetime.now()
         post_dict = post.dict(exclude_unset=True)
@@ -58,17 +58,23 @@ def get_all_the_post(db: Session = Depends(get_db)):
     post = db.query(Post).all()
     return post
 
+@router.get("/post/{post_id}")
+def get_post_and_total_like(post_id: str, db: Session = Depends(get_db)):
+  
+    post = db.query(Post).filter(Post.id == post_id).first()
+    return post
+
 @router.get("/post/{post_id}/{user_id}")
 def post_and_total_like(post_id: str, user_id: str, db: Session = Depends(get_db)):
 
-    post = db.query(Post).filter(Post.id == id).first()(db, post_id)
+    post = db.query(Post).filter(Post.id == post_id).first()
     # return post
 
-    two_post_column = (db.query(Post.post_type, Post.post_display_user).filter(Post.id == post_id).first())
-    public_or_private = two_post_column["post_type"]
+    two_post = (db.query(Post.post_type, Post.post_display_user).filter(Post.id == post_id).first())
+    public_or_private = two_post["post_type"]
     post_user_id_filed = db.query(Post.user_id).filter(Post.id == post_id).first()
     post_user_id = post_user_id_filed["user_id"]
-    
+
     if public_or_private == "public":
         return post
 
@@ -79,18 +85,12 @@ def post_and_total_like(post_id: str, user_id: str, db: Session = Depends(get_db
             return "Sorry, This post is private. So you can't see it."
 
     else:
-        display_all_users = two_post_column["post_display_user"]
+        display_all_users = two_post["post_display_user"]
         display_user_list = display_all_users.split()
         if user_id in display_user_list or user_id == post_user_id:
             return post
         else:
             return "Sorry, This post is private. So you can't see it."
-
-@router.get("/post/{post_id}")
-def get_post_and_total_like(post_id: str, db: Session = Depends(get_db)):
-  
-    post = db.query(Post).filter(Post.id == post_id).first()
-    return post
 
 @router.delete('/post/{id}')
 def delete_post(id: str, db: Session = Depends(get_db)):

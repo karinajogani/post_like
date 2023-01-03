@@ -13,7 +13,7 @@ def create_new_user(user:UserPy, db:Session = Depends(get_db)):
     new_user = User(name=user.name,
                     email=user.email)
     
-    new_user.created_at = datetime.datetime.now()
+    # new_user.created_at = datetime.datetime.now()
     
     db.add(new_user)
     db.commit()
