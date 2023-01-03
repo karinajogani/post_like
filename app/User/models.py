@@ -6,5 +6,3 @@ class User(Common, Base):
     __tablename__ =  "User"
     name = Column(String)
     email = Column(String)
-
-    

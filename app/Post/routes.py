@@ -9,21 +9,21 @@ router = APIRouter()
 
 @router.post("/createpost", status_code=status.HTTP_201_CREATED)
 def create_new_post(post:PostPy, db:Session = Depends(get_db)):
-   
+
     # breakpoint()
     new_post = Post(title=post.title,
                     description=post.description,
                     user_id=post.user_id,
                     post_type=post.post_type,
                     post_display_user=post.post_display_user)
-    
+
     db.add(new_post)
     db.commit()
     return{"message" : "post create successfully"}
 
 @router.put("/post/{id}", status_code=status.HTTP_200_OK)
 def update_post(post_id:str, user_id:str, post:PostUpdate, db: Session = Depends(get_db)):
-    
+
     post_obj = db.query(Post).filter(Post.id == id).first()
     post_user_id = db.query(Post.user_id).filter(Post.id == post_id).first()
     post_user = post_user_id["user_id"]
@@ -37,30 +37,30 @@ def update_post(post_id:str, user_id:str, post:PostUpdate, db: Session = Depends
 
         db.commit()
         return {"message": "Post updated successfully"}
-    else:   
+    else:
         return "You have no rights for update"
 
     # if not post_obj:
     #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    
+
     # post_obj.updated_at  = datetime.datetime.now()
-    
+
     # Data_to_update = post.dict(exclude_unset=True)
     # for key, value in Data_to_update.items():
     #     setattr(post_obj, key, value)
-        
-    # db.commit() 
+
+    # db.commit()
     # return {"message" : "post update successfully"}
 
 @router.get("/post", status_code=status.HTTP_404_NOT_FOUND)
 def get_all_the_post(db: Session = Depends(get_db)):
-   
+
     post = db.query(Post).all()
     return post
 
 @router.get("/post/{post_id}")
 def get_post_and_total_like(post_id: str, db: Session = Depends(get_db)):
-  
+
     post = db.query(Post).filter(Post.id == post_id).first()
     return post
 

@@ -11,13 +11,13 @@ router = APIRouter()
 
 @router.post("/like_post")
 def like_post(like : LikePy, db: Session = Depends(get_db)):
-    
+
     new_like = Like(user_id = like.user_id,
                     post_id = like.post_id)
 
     def post_like_function(db, like: LikePy):
         db_like = (db.query(Like).filter(Like.user_id == like.user_id, Like.post_id == like.post_id).first())
-        
+
         if db_like is not None:
             return "You have already like the post"
         else:
@@ -57,7 +57,7 @@ def like_post(like : LikePy, db: Session = Depends(get_db)):
 def count_the_like(post_id: str, db: Session = Depends(get_db)):
 
     likes = db.query(Like).filter(Like.post_id == post_id).count()
-    return likes    
+    return likes
 
 @router.get("/likes_user_details/{post_id}/{user_id}")
 def post_details(post_id: str, user_id: str, db: Session = Depends(get_db)):
@@ -83,10 +83,10 @@ def post_details(post_id: str, user_id: str, db: Session = Depends(get_db)):
 
 @router.delete("/dislike")
 def dislike_post(like:LikePy, db: Session = Depends(get_db)):
-    
+
     new_like = Like(user_id = like.user_id,
                     post_id = like.post_id)
-    
+
     dislike = (db.query(Like).filter(Like.post_id == new_like.post_id,
                                      Like.user_id == new_like.user_id).first())
     # db.add(new_like)
@@ -97,12 +97,12 @@ def dislike_post(like:LikePy, db: Session = Depends(get_db)):
         db.commit()
 
         total_like_column = db.query(Post.total_like).filter(Post.id == like.post_id).first()
-        
+
         count = total_like_column["total_like"]
         count = count - 1
-        
+
         db.query(Post).filter(Post.id == like.post_id).update({"total_like": count})
-        
+
         db.commit()
 
         post = db.query(Post).filter(Post.id == like.post_id).first()
