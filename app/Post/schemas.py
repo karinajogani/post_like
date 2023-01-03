@@ -14,4 +14,4 @@ class PostPy(BaseModel):
 class PostUpdate(BaseModel):
     title : Optional[str] = None
     description : Optional[str] = None
-    # user_id : Optional[str] = None
+    post_display_user: Optional[str] = None
