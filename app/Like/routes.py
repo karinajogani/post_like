@@ -17,9 +17,7 @@ def like_post(like : LikePy, db: Session = Depends(get_db)):
 
     def post_like_function(db, like: LikePy):
         db_like = (db.query(Like).filter(Like.user_id == like.user_id, Like.post_id == like.post_id).first())
-
-        if db_like is not None:
-            return "You have already like the post"
+        if db_like is not None: return "You have already like the post"
         else:
             db.add(new_like)
             total_like_column = (db.query(Post.total_like).filter(Post.id == like.post_id).first())
@@ -36,22 +34,18 @@ def like_post(like : LikePy, db: Session = Depends(get_db)):
     post_user_id_filed = (db.query(Post.user_id).filter(Post.id == new_like.post_id).first())
     post_user_id = post_user_id_filed["user_id"]
 
-    if public_or_private == "public":
-        return post_like_function(db, new_like)
+    if public_or_private == "public": return post_like_function(db, new_like)
 
     elif public_or_private == "private":
-        if new_like.user_id == post_user_id:
-            return post_like_function(db, new_like)
-        else:
-            return "Sorry, This post is private. So you can't see and like it."
+        if new_like.user_id == post_user_id: return post_like_function(db, new_like)
+        else: return "Sorry, This post is private. So you can't see and like it."
 
     else:
         display_all_users = two_post_column["post_display_user"]
         display_user_list = display_all_users.split()
         if new_like.user_id in display_user_list or new_like.user_id == post_user_id:
             return post_like_function(db, new_like)
-        else:
-            return "you have no rights to like the post."
+        else: return "you have no rights to like the post."
 
 @router.get("/like_count/{post_id}")
 def count_the_like(post_id: str, db: Session = Depends(get_db)):
@@ -73,13 +67,12 @@ def post_details(post_id: str, user_id: str, db: Session = Depends(get_db)):
             like_user_id_list.append(likes_user_id)
 
         user_details_list = []
-        for j in like_user_id_list:
-            user_details = db.query(User).filter(User.id == j).first()
+        for i in like_user_id_list:
+            user_details = db.query(User).filter(User.id == i).first()
             user_details_list.append(user_details)
 
         return user_details_list
-    else:
-        return "Sorry! You can't see the likes user details."
+    else: return "Sorry! You can't see the likes user details."
 
 @router.delete("/dislike")
 def dislike_post(like:LikePy, db: Session = Depends(get_db)):
@@ -90,11 +83,9 @@ def dislike_post(like:LikePy, db: Session = Depends(get_db)):
     dislike = (db.query(Like).filter(Like.post_id == new_like.post_id,
                                      Like.user_id == new_like.user_id).first())
     # db.add(new_like)
-    if dislike is None:
-        return "you haven't liked it."
+    if dislike is None: return "you haven't liked it."
     else:
         db.delete(dislike)
-        db.commit()
 
         total_like_column = db.query(Post.total_like).filter(Post.id == like.post_id).first()
 
@@ -104,6 +95,4 @@ def dislike_post(like:LikePy, db: Session = Depends(get_db)):
         db.query(Post).filter(Post.id == like.post_id).update({"total_like": count})
 
         db.commit()
-
-        post = db.query(Post).filter(Post.id == like.post_id).first()
-        return {"data": post, "message": "dislike the post"}
+        return "dislike the post"

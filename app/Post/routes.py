@@ -10,7 +10,6 @@ router = APIRouter()
 @router.post("/createpost", status_code=status.HTTP_201_CREATED)
 def create_new_post(post:PostPy, db:Session = Depends(get_db)):
 
-    # breakpoint()
     new_post = Post(title=post.title,
                     description=post.description,
                     user_id=post.user_id,
@@ -30,6 +29,7 @@ def update_post(post_id:str, user_id:str, post:PostUpdate, db: Session = Depends
     if post_user== user_id:
 
         post_obj.updated_at = datetime.now()
+        # post_obj.updated_by = getpass.getuser
         post_dict = post.dict(exclude_unset=True)
 
         for key, value in post_dict.items():
@@ -75,8 +75,7 @@ def post_and_total_like(post_id: str, user_id: str, db: Session = Depends(get_db
     post_user_id_filed = db.query(Post.user_id).filter(Post.id == post_id).first()
     post_user_id = post_user_id_filed["user_id"]
 
-    if public_or_private == "public":
-        return post
+    if public_or_private == "public": return post
 
     elif public_or_private == "private":
         if user_id == post_user_id:
@@ -97,9 +96,7 @@ def delete_post(id: str, db: Session = Depends(get_db)):
 
     post_delete = db.query(Post).filter(Post.id == id).first()
 
-    if post_delete is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+    if post_delete is None: raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
 
     db.delete(post_delete)
     db.commit()

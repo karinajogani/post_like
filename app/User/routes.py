@@ -34,11 +34,10 @@ def update_user(id:str, user: UserUpdate, db:Session = Depends(get_db)):
 
     user_obj = db.query(User).filter(User.id == id).first()
 
-    if not user_obj:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    if not user_obj: raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    user_obj.updated_at = datetime.datetime.now()
-
+    # user_obj.updated_at = datetime.datetime.now()
+    # user_obj.updated_by = getpass.getuser
     data_to_update = user.dict(exclude_unset=True)
     for key, value in data_to_update.items():
         setattr(user_obj, key, value)
@@ -51,9 +50,7 @@ def delete_user(id: str, db: Session = Depends(get_db)):
 
     user_delete = db.query(User).filter(User.id == id).first()
 
-    if user_delete is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    if user_delete is None: raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     db.delete(user_delete)
     db.commit()
