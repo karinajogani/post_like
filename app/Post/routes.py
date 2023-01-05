@@ -12,7 +12,7 @@ def create_new_post(post:PostPy, db:Session = Depends(get_db)):
 
     new_post = Post(title=post.title,
                     description=post.description,
-                    user_id=post.user_id,
+                    created_by=post.created_by,
                     post_type=post.post_type,
                     post_display_user=post.post_display_user)
 
@@ -21,12 +21,12 @@ def create_new_post(post:PostPy, db:Session = Depends(get_db)):
     return{"message" : "post create successfully"}
 
 @router.put("/post/{id}", status_code=status.HTTP_200_OK)
-def update_post(post_id:str, user_id:str, post:PostUpdate, db: Session = Depends(get_db)):
+def update_post(post_id:str, created_by:str, post:PostUpdate, db: Session = Depends(get_db)):
 
     post_obj = db.query(Post).filter(Post.id == id).first()
-    post_user_id = db.query(Post.user_id).filter(Post.id == post_id).first()
-    post_user = post_user_id["user_id"]
-    if post_user== user_id:
+    post_user_id = db.query(Post.created_by).filter(Post.id == post_id).first()
+    post_user = post_user_id["created_by"]
+    if post_user== created_by:
 
         post_obj.updated_at = datetime.now()
         # post_obj.updated_by = getpass.getuser
@@ -65,7 +65,7 @@ def get_post_and_total_like(post_id: str, db: Session = Depends(get_db)):
     return post
 
 @router.get("/post/{post_id}/{user_id}")
-def post_and_total_like(post_id: str, user_id: str, db: Session = Depends(get_db)):
+def post_and_total_like(post_id: str, created_by: str, db: Session = Depends(get_db)):
 
     post = db.query(Post).filter(Post.id == post_id).first()
     # return post
@@ -73,12 +73,12 @@ def post_and_total_like(post_id: str, user_id: str, db: Session = Depends(get_db
     two_post = (db.query(Post.post_type, Post.post_display_user).filter(Post.id == post_id).first())
     public_or_private = two_post["post_type"]
     post_user_id_filed = db.query(Post.user_id).filter(Post.id == post_id).first()
-    post_user_id = post_user_id_filed["user_id"]
+    post_user_id = post_user_id_filed["created_by"]
 
     if public_or_private == "public": return post
 
     elif public_or_private == "private":
-        if user_id == post_user_id:
+        if created_by == post_user_id:
             return post
         else:
             return "Sorry, This post is private. So you can't see it."
@@ -86,7 +86,7 @@ def post_and_total_like(post_id: str, user_id: str, db: Session = Depends(get_db
     else:
         display_all_users = two_post["post_display_user"]
         display_user_list = display_all_users.split()
-        if user_id in display_user_list or user_id == post_user_id:
+        if created_by in display_user_list or created_by == post_user_id:
             return post
         else:
             return "Sorry, This post is private. So you can't see it."
@@ -94,11 +94,10 @@ def post_and_total_like(post_id: str, user_id: str, db: Session = Depends(get_db
 @router.delete('/post/{id}')
 def delete_post(id: str, db: Session = Depends(get_db)):
 
-    post_delete = db.query(Post).filter(Post.id == id).first()
+    delete = db.query(Post).filter(Post.id == id).first()
 
-    if post_delete is None: raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+    if delete is None: raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Post not found")
+    else: db.query(Post).filter(Post.id == id).update({"is_delete" == True})
 
-    db.delete(post_delete)
     db.commit()
-
     return {"message": "User delete successfully"}

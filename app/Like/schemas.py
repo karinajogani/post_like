@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 class LikePy(BaseModel):
-    user_id : str
+    created_by : str
     post_id : str
     # name : str
 

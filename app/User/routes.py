@@ -3,7 +3,6 @@ from app.User.schemas import UserPy, UserUpdate
 from sqlalchemy.orm import Session
 from Database.db_base import get_db
 from app.User.models import User
-import datetime
 
 router = APIRouter()
 
@@ -27,32 +26,34 @@ def get_user(db:Session = Depends(get_db)):
 def get_user_by_id(id:str, db: Session = Depends(get_db)):
 
     user = db.query(User).filter(User.id == id).first()
-    return user
+    if user.is_delete == True: return user
+    else: return {"message" : "this user is deleted"}
 
 @router.put("/user/{id}", status_code=status.HTTP_200_OK)
 def update_user(id:str, user: UserUpdate, db:Session = Depends(get_db)):
 
     user_obj = db.query(User).filter(User.id == id).first()
 
-    if not user_obj: raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    if not user_obj:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    else:
+        if user_obj.is_delete == False:
+            data_to_update = user.dict(exclude_unset=True)
+            for key, value in data_to_update.items():
+                setattr(user_obj, key, value)
 
-    # user_obj.updated_at = datetime.datetime.now()
-    # user_obj.updated_by = getpass.getuser
-    data_to_update = user.dict(exclude_unset=True)
-    for key, value in data_to_update.items():
-        setattr(user_obj, key, value)
-
-    db.commit()
-    return {"message" : "user update successfully"}
+            db.commit()
+            return {"message" : "user update successfully"}
+        return {"message" : "user was deleted"}
 
 @router.delete('/user/{id}')
 def delete_user(id: str, db: Session = Depends(get_db)):
 
-    user_delete = db.query(User).filter(User.id == id).first()
+    delete = db.query(User).filter(User.id == id).first()
 
-    if user_delete is None: raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    if delete is None: raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    else: db.query(User).filter(User.id == id).update({"is_delete":True})
 
-    db.delete(user_delete)
     db.commit()
 
     return {"message": "User delete successfully"}

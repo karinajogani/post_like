@@ -8,7 +8,7 @@ class Post(Common, Base):
     __tablename__ = "Post"
     title = Column(String)
     description = Column(String)
-    user_id = Column(UUID, ForeignKey(User.id))
+    created_by = Column(UUID, ForeignKey(User.id))
     total_like = Column(Integer, default=0)
     post_type = Column(String)
     post_display_user = Column(String)

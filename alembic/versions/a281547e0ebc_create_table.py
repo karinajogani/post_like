@@ -1,8 +1,8 @@
 """create table
 
-Revision ID: ddf0d345bf5d
+Revision ID: a281547e0ebc
 Revises:
-Create Date: 2023-01-03 17:18:11.479190
+Create Date: 2023-01-05 16:35:12.798920
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = 'ddf0d345bf5d'
+revision = 'a281547e0ebc'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,8 +22,7 @@ def upgrade():
     sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.Column('created_by', sa.String(), nullable=True),
-    sa.Column('updated_by', sa.String(), nullable=True),
+    sa.Column('is_delete', sa.Boolean(), nullable=True),
     sa.Column('name', sa.String(), nullable=True),
     sa.Column('email', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id')
@@ -32,27 +31,25 @@ def upgrade():
     sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.Column('created_by', sa.String(), nullable=True),
-    sa.Column('updated_by', sa.String(), nullable=True),
+    sa.Column('is_delete', sa.Boolean(), nullable=True),
     sa.Column('title', sa.String(), nullable=True),
     sa.Column('description', sa.String(), nullable=True),
-    sa.Column('user_id', postgresql.UUID(), nullable=True),
+    sa.Column('created_by', postgresql.UUID(), nullable=True),
     sa.Column('total_like', sa.Integer(), nullable=True),
     sa.Column('post_type', sa.String(), nullable=True),
     sa.Column('post_display_user', sa.String(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['User.id'], ),
+    sa.ForeignKeyConstraint(['created_by'], ['User.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('Like',
     sa.Column('id', postgresql.UUID(as_uuid=True), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=True),
     sa.Column('updated_at', sa.DateTime(), nullable=True),
-    sa.Column('created_by', sa.String(), nullable=True),
-    sa.Column('updated_by', sa.String(), nullable=True),
-    sa.Column('user_id', postgresql.UUID(), nullable=True),
+    sa.Column('is_delete', sa.Boolean(), nullable=True),
+    sa.Column('created_by', postgresql.UUID(), nullable=True),
     sa.Column('post_id', postgresql.UUID(), nullable=True),
+    sa.ForeignKeyConstraint(['created_by'], ['User.id'], ),
     sa.ForeignKeyConstraint(['post_id'], ['Post.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['User.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
