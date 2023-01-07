@@ -7,6 +7,8 @@ app = FastAPI()
 
 app.get("/")
 def homepage():
+    """homepage for post-like api
+    """
     return {"data" : "you are at the homepage"}
 
 app.include_router(Userrouter, tags=["User"])

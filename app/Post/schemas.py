@@ -2,6 +2,8 @@ from pydantic import BaseModel
 from typing import Optional
 
 class PostPy(BaseModel):
+    """schema for user'post
+    """
     title : str
     description : str
     created_by : str

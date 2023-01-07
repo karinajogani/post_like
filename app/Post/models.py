@@ -5,6 +5,8 @@ from app.User.models import User
 from app.utils import Common
 
 class Post(Common, Base):
+    """model of user's post
+    """
     __tablename__ = "Post"
     title = Column(String)
     description = Column(String)
